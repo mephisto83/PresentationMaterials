@@ -26,7 +26,7 @@ if(argv[3]):
   # --> ['example', 'args', '123']
 image_mapping = None
 if(argv[4]):
-    image_mapping_file = os.path.dirname(os.path.realpath(__file__))+argv[4]
+    image_mapping_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), argv[4])
     f = open(image_mapping_file, 'r')
     filecontents = f.read()
     image_mapping = json.loads(filecontents)
@@ -34,8 +34,8 @@ scene = context.scene
 
 print("starting ")
 #path = "./1/"
-path =os.path.dirname(os.path.realpath(__file__))+relPath
-path_audio =os.path.dirname(os.path.realpath(__file__))+relAudioPath
+path =  os.path.join(os.path.dirname(os.path.realpath(__file__)), relPath)
+path_audio = os.path.join(os.path.dirname(os.path.realpath(__file__)), relAudioPath)
 files = os.listdir(path)
 files.sort()
 _scene = bpy.data.scenes[0]
@@ -45,7 +45,7 @@ _scene.render.resolution_percentage = 100
 
 
 _scene.render.image_settings.file_format = 'H264'
-_scene.render.filepath = "//output/" + renderPath
+_scene.render.filepath = os.path.join("output", renderPath) 
 _scene.render.ffmpeg.audio_codec = 'MP3'
 _scene.render.ffmpeg.audio_bitrate = 350
 
