@@ -55,7 +55,7 @@ if hasattr(bpy.context.scene, "pl_studio_props"):
 		bpy.context.scene.pl_studio_props.use_background_mask = False
 		bpy.context.scene.pl_studio_props.use_background_mask = True
         
-if hasattr(bpy.context.scene, "pl_skies_settings"):
+if hasattr(bpy.context.scene.world, "pl_skies_settings"):
     bpy.context.scene.world.pl_skies_settings.show_advanced = True
     bpy.context.scene.world.pl_skies_settings.use_advanced_sky = True
     bpy.context.scene.world.pl_skies_settings.use_advanced_sky = False
