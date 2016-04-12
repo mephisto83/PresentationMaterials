@@ -45,7 +45,7 @@ _scene.render.resolution_percentage = 100
 
 
 _scene.render.image_settings.file_format = 'H264'
-_scene.render.filepath = os.path.join("output", renderPath) 
+_scene.render.filepath =  os.path.join(os.path.dirname(os.path.realpath(__file__)),"output", renderPath) # os.path.join("output", renderPath)  os.path.join("output", renderPath) 
 _scene.render.ffmpeg.audio_codec = 'MP3'
 _scene.render.ffmpeg.audio_bitrate = 350
 
