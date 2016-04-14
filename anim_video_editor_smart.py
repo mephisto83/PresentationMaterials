@@ -22,7 +22,7 @@ if(argv[2]):
 
 renderPath = "default"
 if(argv[3]):
-	renderPath = argv[3]+"_"
+	renderPath = argv[3]+".avi"
   # --> ['example', 'args', '123']
 image_mapping = None
 if(argv[4]):
@@ -30,6 +30,13 @@ if(argv[4]):
     f = open(image_mapping_file, 'r')
     filecontents = f.read()
     image_mapping = json.loads(filecontents)
+anim_settings = None
+if(len(argv) > 5 and argv[5]):
+    anim_settings_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), argv[5])
+    f = open(anim_settings_file, 'r')
+    filecontents = f.read()
+    anim_settings = json.loads(filecontents)
+
 scene = context.scene
 
 print("starting ")
@@ -48,6 +55,20 @@ _scene.render.image_settings.file_format = 'H264'
 _scene.render.filepath =  os.path.join(os.path.dirname(os.path.realpath(__file__)),"output", renderPath) # os.path.join("output", renderPath)  os.path.join("output", renderPath) 
 _scene.render.ffmpeg.audio_codec = 'MP3'
 _scene.render.ffmpeg.audio_bitrate = 350
+
+if anim_settings != None and "settings" in anim_settings:
+    settings =  anim_settings["settings"]
+    if "resolution_x" in settings:
+        _scene.render.resolution_x = float(settings["resolution_x"])
+    if "resolution_y" in settings:
+        _scene.render.resolution_y = float(settings["resolution_y"])
+    if "file_format" in settings:
+        _scene.render.image_settings.file_format = settings["file_format"]
+    if "audio_codec" in settings:
+        _scene.render.image_settings.audio_codec = settings["audio_codec"]
+    if "audio_bitrate" in settings:
+        _scene.render.image_settings.audio_bitrate = float(settings["audio_bitrate"])
+
 
 print(files[0])
 # create the sequencer data
