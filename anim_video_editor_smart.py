@@ -69,28 +69,48 @@ if anim_settings != None and "settings" in anim_settings:
     if "audio_bitrate" in settings:
         _scene.render.image_settings.audio_bitrate = float(settings["audio_bitrate"])
 
-
+def getImageFromMap(imap, frame):
+    for im in imap:
+        if im["frame"] == frame:
+            return im
+    return None
+    
 print(files[0])
 # create the sequencer data
 scene.sequence_editor_create()
 filepath = os.path.join(path, files[0])
 print(filepath)
+if image_mapping != None and "renderedfilename" in image_mapping[0]:
+    im = getImageFromMap(image_mapping, 1)
+    seq = scene.sequence_editor.sequences.new_image(
+            name="MyStrip",
+            filepath= os.path.join(os.path.dirname(os.path.realpath(__file__)), relPath, im["renderedfilename"]+'.png') ,
+            channel=1, frame_start=1)
+    nextIm = getImageFromMap(image_mapping, 2)
+    currentIm = 2
+    while(nextIm):
+        impath = nextIm["renderedfilename"]+'.png'
+        print(impath)
+        seq.elements.append(impath)
+        currentIm = currentIm + 1
+        nextIm = getImageFromMap(image_mapping, currentIm)
+    
+else: 
+    # bpy.context.area.type = "VIEW_3D"
+    seq = scene.sequence_editor.sequences.new_image(
+            name="MyStrip",
+            filepath=filepath,
+            channel=1, frame_start=1)
 
-# bpy.context.area.type = "VIEW_3D"
-seq = scene.sequence_editor.sequences.new_image(
-        name="MyStrip",
-        filepath=filepath,
-        channel=1, frame_start=1)
-
-# add the rest of the images.
-if image_mapping == None:
-    for f in files[1:count]:
-        seq.elements.append(f)
-else:
-    for mapping in image_mapping[1:]:
-        count = mapping["frame"]
-        image = mapping["image"]
-        seq.elements.append(files[image])
+    # add the rest of the images.
+    if image_mapping == None:
+        for f in files[1:count]:
+            seq.elements.append(f)
+    else:
+        for mapping in image_mapping[1:]:
+            count = mapping["frame"]
+            image = mapping["image"]
+            seq.elements.append(files[image])
         
 
 files_audio = os.listdir(path_audio)
