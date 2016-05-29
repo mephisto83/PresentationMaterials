@@ -37,7 +37,20 @@ if(len(argv) > 5 and argv[5]):
     filecontents = f.read()
     anim_settings = json.loads(filecontents)
 
+audio_map_settings = None
+if(argv[6]):
+    audio_map_file = argv[6]
+    f = open(audio_map_file, 'r')
+    filecontents = f.read()
+    audio_map_settings = json.loads(filecontents)
+    audio_file_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio") #argv[7]
+
 scene = context.scene
+def findAudioName(array, id):
+    for a in array:
+        if a["id"] == id:
+            return a["fileName"]
+    raise Exception("can not find file")
 
 print("starting ")
 #path = "./1/"
@@ -49,13 +62,26 @@ _scene = bpy.data.scenes[0]
 _scene.render.resolution_x = 1920
 _scene.render.resolution_y = 1080
 _scene.render.resolution_percentage = 100
-
+bpy.context.scene.frame_end = count
 
 _scene.render.image_settings.file_format = 'H264'
-_scene.render.filepath =  os.path.join(os.path.dirname(os.path.realpath(__file__)),"output", renderPath) # os.path.join("output", renderPath)  os.path.join("output", renderPath) 
+_scene.render.filepath =  os.path.join(os.path.dirname(os.path.realpath(__file__)),"output", renderPath) # os.path.join("output", renderPath)  os.path.join("output", renderPath)
 _scene.render.ffmpeg.audio_codec = 'MP3'
 _scene.render.ffmpeg.audio_bitrate = 350
-
+channel = 1
+scene.sequence_editor_create()
+if audio_map_settings != None:
+    audio_array = audio_map_settings["audio"]
+    for audio_item in audio_array:
+        audioFileName = findAudioName(audio_map_settings["resources"], audio_item["audioId"])
+        if audioFileName != None:
+            frame = int(audio_item["start"] * 30)
+            print("audio_file_folder")
+            print(audio_file_folder)
+            filepath_audio = os.path.join(audio_file_folder, audioFileName)
+            scene.sequence_editor.sequences.new_sound(name=audio_item["id"], filepath=filepath_audio, channel=channel, frame_start=frame)
+            channel = (channel + 1) % 32
+            
 if anim_settings != None and "settings" in anim_settings:
     settings =  anim_settings["settings"]
     if "resolution_x" in settings:
@@ -74,10 +100,9 @@ def getImageFromMap(imap, frame):
         if im["frame"] == frame:
             return im
     return None
-    
+
 print(files[0])
 # create the sequencer data
-scene.sequence_editor_create()
 filepath = os.path.join(path, files[0])
 print(filepath)
 if image_mapping != None and "renderedfilename" in image_mapping[0]:
@@ -90,12 +115,11 @@ if image_mapping != None and "renderedfilename" in image_mapping[0]:
     currentIm = 2
     while(nextIm):
         impath = nextIm["renderedfilename"]+'.png'
-        print(impath)
         seq.elements.append(impath)
         currentIm = currentIm + 1
         nextIm = getImageFromMap(image_mapping, currentIm)
-    
-else: 
+
+else:
     # bpy.context.area.type = "VIEW_3D"
     seq = scene.sequence_editor.sequences.new_image(
             name="MyStrip",
@@ -111,7 +135,6 @@ else:
             count = mapping["frame"]
             image = mapping["image"]
             seq.elements.append(files[image])
-        
 
 files_audio = os.listdir(path_audio)
 if len(files_audio) > 0:
@@ -120,6 +143,6 @@ if len(files_audio) > 0:
     scene.sequence_editor.sequences.new_sound( name="MyStrip", filepath=filepath_audio, channel=2, frame_start=1)
 
 bpy.context.scene.frame_end = count
-bpy.ops.render.render(animation=True) 
+bpy.ops.render.render(animation=True)
 
 print("rendered")
