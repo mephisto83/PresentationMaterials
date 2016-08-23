@@ -47,6 +47,7 @@ else:
 bpy.context.scene.frame_start = start
 bpy.context.scene.frame_end = stop
 bpy.context.scene.camera = bpy.data.objects[default_camera]
+
 if use_border:
     bpy.context.scene.render.border_min_x = minx
     bpy.context.scene.render.border_max_x = maxx
@@ -66,13 +67,16 @@ if hasattr(bpy.context.scene, "pl_studio_props"):
 	if bpy.context.scene.pl_studio_props.use_background_mask:
 		bpy.context.scene.pl_studio_props.use_background_mask = False
 		bpy.context.scene.pl_studio_props.use_background_mask = True
-        
-if hasattr(bpy.context.scene.world, "pl_skies_settings") and config_file != None:
-    print("setting pl_skies_settings ------------------------------------------------------------" )
+if config_file != None:
     f = open(config_file, 'r')
     print(config_file)
     filecontents = f.read()
     obj = json.loads(filecontents)
+    # bpy.context.scene.render.image_settings.file_format = obj["settings"]["file_format"]
+    # bpy.context.scene.render.image_settings.film_transparent = obj["settings"]["film_transparent"]
+    
+if hasattr(bpy.context.scene.world, "pl_skies_settings") and config_file != None:
+    print("setting pl_skies_settings ------------------------------------------------------------" )
     proskyconfig = getProskyConfig(obj)
     if proskyconfig != None:
         if "use_pl_skies" in proskyconfig:
