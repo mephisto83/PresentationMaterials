@@ -143,6 +143,10 @@ if len(files_audio) > 0:
     scene.sequence_editor.sequences.new_sound( name="MyStrip", filepath=filepath_audio, channel=2, frame_start=1)
 
 bpy.context.scene.frame_end = count
+bpy.context.scene.render.fps = 30
+bpy.context.scene.render.fps_base = 1
+
 bpy.ops.render.render(animation=True)
+
 
 print("rendered")
